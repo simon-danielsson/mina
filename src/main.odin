@@ -33,12 +33,29 @@ Cell :: struct {
     rect:          rl.Rectangle,
     cell_pos:      CellPos, // pos on the game grid
     hovered:       bool,
+    neighbors:     [8]CellPos,
 }
 
-update :: proc(cl: ^[GAME_AREA]Cell) -> bool {
+auto_open_neighboring_cells :: proc(c: ^Cell, cl: ^[GAME_AREA]Cell) {
+    if c.is_bomb {return}
+    c.state = CellState.OPENED
+    for pos in cl[c.id].neighbors {
+        for &cn in cl {
+            if cn.is_bomb {continue}
+            if cn.cell_pos == pos {
+                if cn.state != CellState.FLAGGED {
+                    cn.state = CellState.OPENED
+                }
+            }
+        }
+    }
+}
+
+update :: proc(cl: ^[GAME_AREA]Cell) -> (Cell, bool) {
     mousePoint := rl.GetMousePosition()
     btnAction := false
 
+    cr := Cell{}
     for &c in cl {
         if (rl.CheckCollisionPointRec(mousePoint, c.rect)) {
             c.hovered = true
@@ -46,9 +63,8 @@ update :: proc(cl: ^[GAME_AREA]Cell) -> bool {
             if c.state == CellState.UNOPENED || c.state == CellState.FLAGGED {
                 if rl.IsMouseButtonPressed(rl.MouseButton.LEFT) {
                     c.state = CellState.OPENED
-                    if c.is_bomb {
-                        return true
-                    }
+                    if c.is_bomb {return c, true}
+                    cr = c; break
                 }
 
                 if rl.IsMouseButtonPressed(rl.MouseButton.RIGHT) {
@@ -59,7 +75,7 @@ update :: proc(cl: ^[GAME_AREA]Cell) -> bool {
             c.hovered = false
         }
     }
-    return false
+    return cr, false
 }
 
 main :: proc() {
@@ -72,8 +88,10 @@ main :: proc() {
     for !rl.WindowShouldClose() {
 
         // update -------------------------------------------------------------
+        cr := Cell{}
         if !game_over {
-            game_over = update(&cl)
+            cr, game_over = update(&cl)
+            auto_open_neighboring_cells(&cr, &cl)
         }
 
         // drawing ------------------------------------------------------------
