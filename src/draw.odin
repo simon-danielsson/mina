@@ -4,11 +4,16 @@ import "core:fmt"
 import "core:strings"
 import rl "vendor:raylib"
 
-draw_end_text :: proc(s: string) {
+draw_end_text :: proc(s: string, state: GameState) {
+    color := rl.RED if state == GameState.LOSE else rl.GREEN
+    overlay := rl.ColorAlpha(color, 0.15)
+    overlay = rl.ColorBrightness(overlay, -0.55)
+    rl.DrawRectangle(0, 0, WIN_SIZE, WIN_SIZE, overlay)
+
     text := strings.clone_to_cstring(s)
     font_size: i32 = WIN_SIZE / 12
     text_w := rl.MeasureText(text, font_size)
-    rl.DrawText(text, (WIN_SIZE / 2) - text_w / 2, WIN_SIZE / 2, font_size, rl.BLACK)
+    rl.DrawText(text, (WIN_SIZE / 2) - text_w / 2, WIN_SIZE / 2, font_size, color)
 }
 
 draw_cell :: proc(c: Cell) {

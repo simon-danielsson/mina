@@ -73,8 +73,8 @@ update :: proc(cl: ^[GAME_AREA]Cell) -> (Cell, GameState) {
             if rl.IsMouseButtonPressed(rl.MouseButton.RIGHT) {
                 c.state =
                 CellState.FLAGGED if c.state == CellState.UNOPENED else CellState.UNOPENED
-
             }
+
         } else {
             c.hovered = false
         }
@@ -126,10 +126,9 @@ main :: proc() {
         for c in cl {draw_cell(c)}
 
         if check_win(&cl) {
-            draw_end_text("You win!")
-            state = GameState.WIN
+            draw_end_text("You win!", state)
         } else if state == GameState.LOSE {
-            draw_end_text("You exploded!")
+            draw_end_text("You exploded!", state)
         }
 
         rl.EndDrawing()
