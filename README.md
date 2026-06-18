@@ -2,7 +2,7 @@
   
 <p align="center">
     <img src="https://img.shields.io/badge/license-MIT-green?style=flat-square" alt="MIT License" />
-  <img src="https://img.shields.io/github/last-commit/simon-danielsson/dance/main?style=flat-square&color=blue" alt="Last commit" />
+  <img src="https://img.shields.io/github/last-commit/simon-danielsson/mina/main?style=flat-square&color=blue" alt="Last commit" />
 </p>
   
 <p align="center">
