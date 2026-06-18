@@ -67,8 +67,20 @@ draw_cell :: proc(c: Cell) {
         )
     }
 
+    text := fmt.tprint(c.bombs_closeby)
+    if c.bombs_closeby > 0 && c.state == CellState.OPENED {
+        font_size: i32 = 20
+        rl.DrawText(
+            strings.clone_to_cstring(text),
+            i32(c.rect.x + (CELL_SIZE / 2) - f32(font_size / 2)),
+            i32(c.rect.y + (CELL_SIZE / 2) - f32(font_size / 2)),
+            font_size,
+            rl.YELLOW,
+        )
+    }
+
     // debug text
-    text := fmt.tprint(c.id)
+    text = fmt.tprint(c.id)
     if DRAW_DEBUG_TEXT_ON_CELLS {
         font_size: i32 = 20
         rl.DrawText(
