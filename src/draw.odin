@@ -6,8 +6,7 @@ import rl "vendor:raylib"
 
 draw_end_text :: proc(s: string, state: GameState) {
     color := rl.RED if state == GameState.LOSE else rl.GREEN
-    overlay := rl.ColorAlpha(color, 0.15)
-    overlay = rl.ColorBrightness(overlay, -0.55)
+    overlay := rl.ColorBrightness(rl.ColorAlpha(color, 0.15), -0.55)
     rl.DrawRectangle(0, 0, WIN_SIZE, WIN_SIZE, overlay)
 
     text := strings.clone_to_cstring(s)
@@ -27,7 +26,7 @@ draw_cell :: proc(c: Cell) {
     border_col := rl.ColorAlpha(rl.DARKGRAY, 0.9)
     border_thickness := i32(CELL_SIZE) / 20
 
-    // border
+    // border (just a bigger rectangle beneath the smaller one, the body)
     rl.DrawRectangle(i32(c.rect.x), i32(c.rect.y), CELL_SIZE, CELL_SIZE, border_col)
 
     // body

@@ -37,7 +37,7 @@ Cell :: struct {
     bombs_closeby: int,
     rect:          rl.Rectangle,
     cell_pos:      CellPos, // pos on the game grid
-    hovered:       bool,
+    hovered:       bool, // cursor hover ui signal
     neighbors:     [8]CellPos, // positions of neighbors
 }
 
