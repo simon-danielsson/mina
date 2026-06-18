@@ -50,7 +50,7 @@ auto_open_neighboring_cells :: proc(c: ^Cell, cl: ^[GAME_AREA]Cell) {
     }
 }
 
-update :: proc(cl: ^[GAME_AREA]Cell) -> (Cell, bool) {
+update :: proc(cl: ^[GAME_AREA]Cell) -> (Cell, GameState) {
     mousePoint := rl.GetMousePosition()
     btnAction := false
 
@@ -62,7 +62,7 @@ update :: proc(cl: ^[GAME_AREA]Cell) -> (Cell, bool) {
             if c.state == CellState.UNOPENED || c.state == CellState.FLAGGED {
                 if rl.IsMouseButtonPressed(rl.MouseButton.LEFT) {
                     c.state = CellState.OPENED
-                    if c.is_bomb {return c, true}
+                    if c.is_bomb {return c, GameState.LOSE}
                     cr = c; break
                 }
 
@@ -74,7 +74,7 @@ update :: proc(cl: ^[GAME_AREA]Cell) -> (Cell, bool) {
             c.hovered = false
         }
     }
-    return cr, false
+    return cr, GameState.PLAY
 }
 
 check_win :: proc(cl: ^[GAME_AREA]Cell) -> bool {
@@ -96,23 +96,26 @@ check_win :: proc(cl: ^[GAME_AREA]Cell) -> bool {
     return true
 }
 
+GameState :: enum {
+    PLAY,
+    LOSE,
+    WIN,
+}
+
 main :: proc() {
     cl := init_cells()
 
     rl.InitWindow(WIN_SIZE, WIN_SIZE, "mina")
 
-    game_over := false
-    win := false
+    state := GameState.PLAY
 
     for !rl.WindowShouldClose() {
 
         // update -------------------------------------------------------------
-        cr := Cell{}
-        if !game_over {
-            if !win {
-                cr, game_over = update(&cl)
-                auto_open_neighboring_cells(&cr, &cl)
-            }
+        if state == GameState.PLAY {
+            cr := Cell{}
+            cr, state = update(&cl)
+            auto_open_neighboring_cells(&cr, &cl)
         }
 
         // drawing ------------------------------------------------------------
@@ -127,8 +130,8 @@ main :: proc() {
 
         if check_win(&cl) {
             draw_end_text("You win!")
-            win = true
-        } else if game_over {
+            state = GameState.WIN
+        } else if state == GameState.LOSE {
             draw_end_text("You exploded!")
         }
 
