@@ -1,0 +1,8 @@
+[WARN][2026-06-18 10:35:06] ...share/bob/nightly/share/nvim/runtime/lua/vim/lsp/log.lua:149	'08:35:06.095 WARNING ⛔️ updateConfiguration: failed with [\n  {\n    "code": "invalid_type",\n    "expected": "object",\n    "received": "array",\n    "path": [],\n    "message": "Expected object, received array"\n  }\n]'
+[WARN][2026-06-18 10:35:06] ...share/bob/nightly/share/nvim/runtime/lua/vim/lsp/log.lua:149	'08:35:06.097 WARNING ⛔️ updateConfiguration: failed with [\n  {\n    "code": "invalid_type",\n    "expected": "object",\n    "received": "array",\n    "path": [],\n    "message": "Expected object, received array"\n  }\n]'
+[WARN][2026-06-18 10:35:06] ...share/bob/nightly/share/nvim/runtime/lua/vim/lsp/log.lua:149	"08:35:06.617 WARNING ⛔️ ShellCheck: disabling linting as no executable was found at path 'shellcheck'"
+[ERROR][2026-06-18 10:35:08] ...share/bob/nightly/share/nvim/runtime/lua/vim/lsp/log.lua:149	"Starting Odin Language Server dev-2026-04-12-ad1d9354"
+[START][2026-06-18 10:35:39] LSP logging initiated
+[ERROR][2026-06-18 10:35:39] ...share/bob/nightly/share/nvim/runtime/lua/vim/lsp/log.lua:149	"Starting Odin Language Server dev-2026-04-12-ad1d9354"
+[START][2026-06-18 10:35:56] LSP logging initiated
+[ERROR][2026-06-18 10:35:56] ...share/bob/nightly/share/nvim/runtime/lua/vim/lsp/log.lua:149	"Starting Odin Language Server dev-2026-04-12-ad1d9354"
