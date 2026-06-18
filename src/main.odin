@@ -1,6 +1,5 @@
 package main
 
-import "core:strings"
 import rl "vendor:raylib"
 
 DRAW_DEBUG_TEXT_ON_CELLS :: false
@@ -78,20 +77,42 @@ update :: proc(cl: ^[GAME_AREA]Cell) -> (Cell, bool) {
     return cr, false
 }
 
+check_win :: proc(cl: ^[GAME_AREA]Cell) -> bool {
+    for &c in cl {
+        if c.is_bomb {
+            if c.state == CellState.UNOPENED || c.state == CellState.FLAGGED {
+                continue
+            } else {
+                panic("the program is not supposed to be here")
+            }
+        }
+        if c.state == CellState.OPENED {
+            continue
+        }
+        if c.state == CellState.UNOPENED || c.state == CellState.FLAGGED {
+            return false
+        }
+    }
+    return true
+}
+
 main :: proc() {
     cl := init_cells()
 
     rl.InitWindow(WIN_SIZE, WIN_SIZE, "mina")
 
     game_over := false
+    win := false
 
     for !rl.WindowShouldClose() {
 
         // update -------------------------------------------------------------
         cr := Cell{}
         if !game_over {
-            cr, game_over = update(&cl)
-            auto_open_neighboring_cells(&cr, &cl)
+            if !win {
+                cr, game_over = update(&cl)
+                auto_open_neighboring_cells(&cr, &cl)
+            }
         }
 
         // drawing ------------------------------------------------------------
@@ -104,11 +125,11 @@ main :: proc() {
             draw_cell(c)
         }
 
-        if game_over {
-            text := strings.clone_to_cstring("You exploded!")
-            font_size: i32 = WIN_SIZE / 12
-            text_w := rl.MeasureText(text, font_size)
-            rl.DrawText(text, (WIN_SIZE / 2) - text_w / 2, WIN_SIZE / 2, font_size, rl.BLACK)
+        if check_win(&cl) {
+            draw_end_text("You win!")
+            win = true
+        } else if game_over {
+            draw_end_text("You exploded!")
         }
 
         rl.EndDrawing()

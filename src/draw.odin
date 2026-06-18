@@ -4,6 +4,13 @@ import "core:fmt"
 import "core:strings"
 import rl "vendor:raylib"
 
+draw_end_text :: proc(s: string) {
+    text := strings.clone_to_cstring(s)
+    font_size: i32 = WIN_SIZE / 12
+    text_w := rl.MeasureText(text, font_size)
+    rl.DrawText(text, (WIN_SIZE / 2) - text_w / 2, WIN_SIZE / 2, font_size, rl.BLACK)
+}
+
 draw_cell :: proc(c: Cell) {
     color := rl.GRAY
     if c.hovered {
