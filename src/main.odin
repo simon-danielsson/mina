@@ -13,6 +13,12 @@ BOMB_AMT :: (GAME_SIZE * 10) / 8 // difficulty scales with GAME_SIZE
 
 #assert(WIN_SIZE % GAME_SIZE == 0)
 
+GameState :: enum {
+    PLAY,
+    LOSE,
+    WIN,
+}
+
 CellState :: enum {
     UNOPENED,
     OPENED,
@@ -32,7 +38,7 @@ Cell :: struct {
     rect:          rl.Rectangle,
     cell_pos:      CellPos, // pos on the game grid
     hovered:       bool,
-    neighbors:     [8]CellPos,
+    neighbors:     [8]CellPos, // positions of neighbors
 }
 
 auto_open_neighboring_cells :: proc(c: ^Cell, cl: ^[GAME_AREA]Cell) {
@@ -52,23 +58,22 @@ auto_open_neighboring_cells :: proc(c: ^Cell, cl: ^[GAME_AREA]Cell) {
 
 update :: proc(cl: ^[GAME_AREA]Cell) -> (Cell, GameState) {
     mousePoint := rl.GetMousePosition()
-    btnAction := false
 
     cr := Cell{}
     for &c in cl {
         if (rl.CheckCollisionPointRec(mousePoint, c.rect)) {
             c.hovered = true
 
-            if c.state == CellState.UNOPENED || c.state == CellState.FLAGGED {
-                if rl.IsMouseButtonPressed(rl.MouseButton.LEFT) {
-                    c.state = CellState.OPENED
-                    if c.is_bomb {return c, GameState.LOSE}
-                    cr = c; break
-                }
+            if rl.IsMouseButtonPressed(rl.MouseButton.LEFT) {
+                c.state = CellState.OPENED
+                if c.is_bomb {return c, GameState.LOSE}
+                cr = c; break
+            }
 
-                if rl.IsMouseButtonPressed(rl.MouseButton.RIGHT) {
-                    c.state = CellState.FLAGGED
-                }
+            if rl.IsMouseButtonPressed(rl.MouseButton.RIGHT) {
+                c.state =
+                CellState.FLAGGED if c.state == CellState.UNOPENED else CellState.UNOPENED
+
             }
         } else {
             c.hovered = false
@@ -96,12 +101,6 @@ check_win :: proc(cl: ^[GAME_AREA]Cell) -> bool {
     return true
 }
 
-GameState :: enum {
-    PLAY,
-    LOSE,
-    WIN,
-}
-
 main :: proc() {
     cl := init_cells()
 
@@ -124,9 +123,7 @@ main :: proc() {
 
         rl.ClearBackground(rl.DARKGRAY)
 
-        for c in cl {
-            draw_cell(c)
-        }
+        for c in cl {draw_cell(c)}
 
         if check_win(&cl) {
             draw_end_text("You win!")
