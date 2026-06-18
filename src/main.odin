@@ -30,8 +30,9 @@ Cell :: struct {
     state:         CellState,
     is_bomb:       bool,
     bombs_closeby: int,
-    cell_pos:      CellPos,
-    real_pos:      rl.Vector2,
+    rect:          rl.Rectangle,
+    cell_pos:      CellPos, // pos on the game grid
+    hovered:       bool,
 }
 
 init_cells :: proc() -> [GAME_AREA]Cell {
@@ -49,15 +50,18 @@ init_cells :: proc() -> [GAME_AREA]Cell {
             }
 
             cl[counter] = Cell {
-                id            = counter,
+                id = counter,
                 bombs_closeby = 0,
-                is_bomb       = b,
-                state         = CellState.OPENED,
-                cell_pos      = CellPos{row, col},
-                real_pos      = rl.Vector2 {
-                    f32(WIN_SIZE / GAME_SIZE) * f32(col),
-                    f32(WIN_SIZE / GAME_SIZE) * f32(row),
+                is_bomb = b,
+                rect = rl.Rectangle {
+                    x = f32(WIN_SIZE / GAME_SIZE) * f32(col),
+                    y = f32(WIN_SIZE / GAME_SIZE) * f32(row),
+                    width = CELL_SIZE,
+                    height = CELL_SIZE,
                 },
+                state = CellState.UNOPENED,
+                cell_pos = CellPos{row, col},
+                hovered = false,
             }
             if cl[counter].is_bomb {
                 bombs_planted += 1
@@ -86,15 +90,42 @@ init_cells :: proc() -> [GAME_AREA]Cell {
     return cl
 }
 
+update :: proc(cl: ^[GAME_AREA]Cell) {
+    mousePoint := rl.GetMousePosition()
+    btnAction := false
+
+    for &c in cl {
+        if (rl.CheckCollisionPointRec(mousePoint, c.rect)) {
+            c.hovered = true
+            if c.state == CellState.UNOPENED || c.state == CellState.FLAGGED {
+                if rl.IsMouseButtonPressed(rl.MouseButton.LEFT) {
+                    c.state = CellState.OPENED
+                }
+                if rl.IsMouseButtonPressed(rl.MouseButton.RIGHT) {
+                    c.state = CellState.FLAGGED
+                }
+            }
+        } else {
+            c.hovered = false
+        }
+    }
+}
+
 main :: proc() {
     cl := init_cells()
 
     rl.InitWindow(WIN_SIZE, WIN_SIZE, "mina")
 
     for !rl.WindowShouldClose() {
+
+        // update -------------------------------------------------------------
+        update(&cl)
+
+        // drawing ------------------------------------------------------------
+
         rl.BeginDrawing()
 
-        rl.ClearBackground(rl.BLACK)
+        rl.ClearBackground(rl.DARKGRAY)
 
         for c in cl {
             draw_cell(c)
