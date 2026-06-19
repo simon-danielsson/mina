@@ -60,6 +60,7 @@ auto_open_neighboring_cells :: proc(c: ^Cell, cl: ^[GAME_AREA]Cell) {
 
 update :: proc(cl: ^[GAME_AREA]Cell) -> (Cell, GameState) {
     mousePoint := rl.GetMousePosition()
+    click := false
 
     cr := Cell{}
     for &c in cl {
@@ -68,11 +69,13 @@ update :: proc(cl: ^[GAME_AREA]Cell) -> (Cell, GameState) {
 
             if rl.IsMouseButtonPressed(rl.MouseButton.LEFT) {
                 c.state = CellState.OPENED
+                click := true
                 if c.is_bomb {return c, GameState.LOSE}
                 cr = c; break
             }
 
             if rl.IsMouseButtonPressed(rl.MouseButton.RIGHT) {
+                click := true
                 c.state =
                 CellState.FLAGGED if c.state == CellState.UNOPENED else CellState.UNOPENED
             }
@@ -109,17 +112,15 @@ main :: proc() {
     rl.InitWindow(WIN_SIZE, WIN_SIZE, "mina")
     rl.SetTargetFPS(20)
     state := GameState.PLAY
-    first_frame := true
 
     for !rl.WindowShouldClose() {
-
         // update -------------------------------------------------------------
+        click := false
         if state == GameState.PLAY {
             cr := Cell{}
             cr, state = update(&cl)
-            if !first_frame {
+            if cr.hovered {
                 auto_open_neighboring_cells(&cr, &cl)
-                first_frame = false
             }
         }
 
