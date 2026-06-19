@@ -109,6 +109,7 @@ main :: proc() {
     rl.InitWindow(WIN_SIZE, WIN_SIZE, "mina")
     rl.SetTargetFPS(20)
     state := GameState.PLAY
+    first_frame := true
 
     for !rl.WindowShouldClose() {
 
@@ -116,7 +117,10 @@ main :: proc() {
         if state == GameState.PLAY {
             cr := Cell{}
             cr, state = update(&cl)
-            auto_open_neighboring_cells(&cr, &cl)
+            if !first_frame {
+                auto_open_neighboring_cells(&cr, &cl)
+                first_frame = false
+            }
         }
 
         // drawing ------------------------------------------------------------
