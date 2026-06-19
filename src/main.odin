@@ -89,15 +89,11 @@ update :: proc(cl: ^[GAME_AREA]Cell) -> (Cell, GameState) {
 
 check_win :: proc(cl: ^[GAME_AREA]Cell) -> bool {
     for &c in cl {
+        if c.state == CellState.OPENED {continue}
         if c.is_bomb {
             if c.state == CellState.UNOPENED || c.state == CellState.FLAGGED {
                 continue
-            } else {
-                panic("the program is not supposed to be here")
             }
-        }
-        if c.state == CellState.OPENED {
-            continue
         }
         if c.state == CellState.UNOPENED || c.state == CellState.FLAGGED {
             return false
@@ -107,11 +103,8 @@ check_win :: proc(cl: ^[GAME_AREA]Cell) -> bool {
 }
 
 main :: proc() {
-    cl := init_cells()
-
-    rl.InitWindow(WIN_SIZE, WIN_SIZE, "mina")
-    rl.SetTargetFPS(20)
-    state := GameState.PLAY
+    cl := init_cells(); state := GameState.PLAY
+    rl.InitWindow(WIN_SIZE, WIN_SIZE, "mina"); rl.SetTargetFPS(20)
 
     for !rl.WindowShouldClose() {
         // update -------------------------------------------------------------
@@ -126,24 +119,23 @@ main :: proc() {
 
         // drawing ------------------------------------------------------------
 
-        rl.BeginDrawing()
-
-        rl.ClearBackground(rl.DARKGRAY)
+        rl.BeginDrawing(); rl.ClearBackground(rl.DARKGRAY)
 
         for c in cl {draw_cell(c)}
-
-        if DEBUG {
-            fps := rl.GetFPS()
-            text := fmt.tprint(fps)
-            rl.DrawText(strings.clone_to_cstring(text), 0, 0, 20, rl.PURPLE)
-        }
 
         if check_win(&cl) || state == GameState.WIN {
             draw_end_text("You win!", state)
             state = GameState.WIN
         }
+
         if state == GameState.LOSE {
             draw_end_text("You exploded!", state)
+        }
+
+        if DEBUG {
+            fps := rl.GetFPS()
+            text := fmt.tprint(fps)
+            rl.DrawText(strings.clone_to_cstring(text), 0, 0, 20, rl.PURPLE)
         }
 
         rl.EndDrawing()
