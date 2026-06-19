@@ -1,8 +1,10 @@
 package main
 
+import "core:fmt"
+import "core:strings"
 import rl "vendor:raylib"
 
-DRAW_DEBUG_TEXT_ON_CELLS :: false
+DEBUG :: false
 
 GAME_SIZE :: 9 // master size
 
@@ -105,7 +107,7 @@ main :: proc() {
     cl := init_cells()
 
     rl.InitWindow(WIN_SIZE, WIN_SIZE, "mina")
-
+    rl.SetTargetFPS(20)
     state := GameState.PLAY
 
     for !rl.WindowShouldClose() {
@@ -125,9 +127,17 @@ main :: proc() {
 
         for c in cl {draw_cell(c)}
 
-        if check_win(&cl) {
+        if DEBUG {
+            fps := rl.GetFPS()
+            text := fmt.tprint(fps)
+            rl.DrawText(strings.clone_to_cstring(text), 0, 0, 20, rl.PURPLE)
+        }
+
+        if check_win(&cl) || state == GameState.WIN {
             draw_end_text("You win!", state)
-        } else if state == GameState.LOSE {
+            state = GameState.WIN
+        }
+        if state == GameState.LOSE {
             draw_end_text("You exploded!", state)
         }
 

@@ -92,7 +92,7 @@ draw_cell :: proc(c: Cell) {
 
     // debug text
     text = fmt.tprint(c.id)
-    if DRAW_DEBUG_TEXT_ON_CELLS {
+    if DEBUG {
         font_size: i32 = 20
         rl.DrawText(
             strings.clone_to_cstring(text),
